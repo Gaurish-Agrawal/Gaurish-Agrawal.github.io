@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Locus Suit — Coming Soon</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 3.8rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      margin: 0;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+    }
+
+    p {
+      font-size: 1.3rem;
+      color: #aaa;
+      margin-top: 0.8rem;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+      animation-delay: 1s;
+    }
+
+    .coming-soon {
+      font-size: 0.95rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #555;
+      margin-top: 2.5rem;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+      animation-delay: 2s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Locus Suit</h1>
+  <p>Restoring independence in every step</p>
+  <div class="coming-soon">Coming Soon</div>
+</body>
+</html>
