@@ -1,43 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Locus Suit — Coming Soon</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      background-color: #000;
-      color: #fff;
-      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locus Suit — Smart Sensory Wearables</title>
 
-    h1 {
-      font-size: 3.8rem;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      margin: 0;
-      opacity: 0;
-      animation: fadeIn 2s ease forwards;
-    }
+<style>
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; 
+  height: 0;
+}
 
-    p {
-      font-size: 1.3rem;
-      color: #aaa;
-      margin-top: 0.8rem;
-      opacity: 0;
-      animation: fadeIn 2s ease forwards;
-      animation-delay: 1s;
-    }
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+</style>
 
-    .coming-soon {
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, Inter, Helvetica Neue, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .center-block {
+    text-align: center;
+    padding: 20px;
+    animation: fadeIn 1.2s ease forwards;
+    opacity: 0;
+  }
+
+  h1 {
+    font-size: clamp(55px, 7vw, 120px);
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+  }
+
+  .subtitle {
+    font-size: clamp(20px, 2vw, 30px);
+    opacity: 0.85;
+    margin-bottom: 45px;
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .btn {
+    padding: 14px 32px;
+    font-size: 18px;
+    border: 2px solid #fff;
+    background: transparent;
+    color: #fff;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: 0.25s ease;
+  }
+
+  .btn:hover {
+    background: #fff;
+    color: #000;
+  }
+
+  /* LinkedIn icon styling */
+  .linkedin-icon {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.2s ease;
+  }
+  .linkedin-icon:hover {
+    opacity: 0.7;
+  }
+
+  /* Modal */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .modal-content {
+    max-width: 800px;
+    width: 90%;
+  }
+
+  video {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .close {
+    position: absolute;
+    top: 25px;
+    right: 35px;
+    font-size: 26px;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .coming-soon {
       font-size: 0.95rem;
       letter-spacing: 4px;
       text-transform: uppercase;
@@ -47,16 +133,70 @@
       animation: fadeIn 2s ease forwards;
       animation-delay: 2s;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+</style>
 </head>
+
 <body>
+
+<div class="center-block">
   <h1>Locus Suit</h1>
-  <p>Smart Sensory Wearables For Navigation<br>Restoring independence in every step</p>
+  <div class="subtitle">Smart Sensory Wearables For Navigation</div>
+
+  <div class="button-row">
+    <button class="btn" onclick="openModal()">Watch Demo</button>
+
+    <a href="https://www.linkedin.com/company/locussuit" target="_blank">
+  <button class="btn">LinkedIn</button>
+</a>
+  </div>
+
   <div class="coming-soon">Coming Soon</div>
+
+</div>
+
+<!-- Video Modal -->
+<div id="videoModal" class="modal">
+  <div class="close" onclick="closeModal()">×</div>
+
+  <div class="modal-content">
+
+    <div class="subtitle">
+      Introducing the Locus Suit. Restoring Independence in Every Step.
+    </div>
+    <br>
+
+    <!-- YouTube embed -->
+    <div class="video-wrapper">
+      <iframe
+        id="demoVideo"
+        width="100%"
+        height="400"
+        src="https://www.youtube.com/embed/qncACJptDwY?autoplay=1"
+        title="Locus Suit Demo"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById("videoModal");
+  const video = document.getElementById("demoVideo");
+
+  function openModal() {
+    modal.style.display = "flex";
+    video.currentTime = 0;
+    video.play();
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+    video.pause();
+  }
+</script>
+
 </body>
 </html>
