@@ -1,202 +1,915 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Locus Suit — Smart Sensory Wearables</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOCUS — Haptic Navigation System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #161616;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1a1;
+            --text-muted: #525252;
+            --border: #262626;
+            --border-hover: #404040;
+            --accent: #e5e5e5;
+        }
 
-<style>
-.video-wrapper {
-  position: relative;
-  padding-bottom: 56.25%; 
-  height: 0;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.video-wrapper iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-</style>
+        html {
+            scroll-behavior: smooth;
+        }
 
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Instrument Sans', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
 
-  body {
-    background: #000;
-    color: #fff;
-    font-family: -apple-system, BlinkMacSystemFont, Inter, Helvetica Neue, sans-serif;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
 
-  .center-block {
-    text-align: center;
-    padding: 20px;
-    animation: fadeIn 1.2s ease forwards;
-    opacity: 0;
-  }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--border); 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 
-  h1 {
-    font-size: clamp(55px, 7vw, 120px);
-    letter-spacing: 2px;
-    margin-bottom: 15px;
-  }
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
 
-  .subtitle {
-    font-size: clamp(20px, 2vw, 30px);
-    opacity: 0.85;
-    margin-bottom: 45px;
-  }
+        .nav-link {
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+            padding: 0.5rem 0;
+            position: relative;
+        }
 
-  .button-row {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    align-items: center;
-  }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--text-primary);
+            transition: width 0.3s ease;
+        }
 
-  .btn {
-    padding: 14px 32px;
-    font-size: 18px;
-    border: 2px solid #fff;
-    background: transparent;
-    color: #fff;
-    border-radius: 40px;
-    cursor: pointer;
-    transition: 0.25s ease;
-  }
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
 
-  .btn:hover {
-    background: #fff;
-    color: #000;
-  }
+        .nav-link:hover::after {
+            width: 100%;
+        }
 
-  /* LinkedIn icon styling */
-  .linkedin-icon {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: opacity 0.2s ease;
-  }
-  .linkedin-icon:hover {
-    opacity: 0.7;
-  }
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: black;
+        }
 
-  /* Modal */
-  .modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
+        .hero-title {
+            font-size: clamp(3rem, 12vw, 9rem);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 0.9;
+        }
 
-  .modal-content {
-    max-width: 800px;
-    width: 90%;
-  }
+        .hero-subtitle {
+            font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.7;
+        }
 
-  video {
-    width: 100%;
-    border-radius: 8px;
-  }
+        /* Ambient glow */
+        .glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
 
-  .close {
-    position: absolute;
-    top: 25px;
-    right: 35px;
-    font-size: 26px;
-    color: #fff;
-    cursor: pointer;
-  }
+        /* Section styling */
+        .section {
+            padding: 8rem 0;
+            border-top: 1px solid var(--border);
+        }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(25px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
 
-  .coming-soon {
-      font-size: 0.95rem;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: #555;
-      margin-top: 2.5rem;
-      opacity: 0;
-      animation: fadeIn 2s ease forwards;
-      animation-delay: 2s;
-    }
-</style>
+        .section-label::before {
+            content: '';
+            width: 24px;
+            height: 1px;
+            background: var(--border-hover);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+        }
+
+        .card-image {
+            aspect-ratio: 4/3;
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 30% 70%, rgba(255,255,255,0.02) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(255,255,255,0.02) 0%, transparent 50%);
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .card-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Interactive Panels */
+        .panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .panel-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            padding: 0.25rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            text-transform: uppercase;
+        }
+
+        .panel-body {
+            padding: 2rem;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Haptic Ring */
+        .haptic-ring {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+        }
+
+        .haptic-ring::before {
+            content: '';
+            position: absolute;
+            inset: 30px;
+            border-radius: 50%;
+            border: 1px dashed var(--border);
+        }
+
+        .haptic-motor {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .haptic-motor.active {
+            background: var(--text-primary);
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+            transform: scale(1.4);
+        }
+
+        .haptic-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: var(--text-muted);
+            border-radius: 50%;
+        }
+
+        /* LIDAR Canvas */
+        #lidar-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Readout */
+        .readout {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-top: 2rem;
+        }
+
+        .readout-value {
+            color: var(--text-primary);
+        }
+
+        /* Recognition Grid */
+        .recognition-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+
+        .recognition-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .recognition-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+        }
+
+        .recognition-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--text-secondary);
+        }
+
+        .recognition-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+        }
+
+        /* Quote */
+        .quote {
+            font-size: 1.5rem;
+            font-weight: 400;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .quote-author {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            display: block;
+            transition: color 0.2s;
+        }
+
+        .form-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 1rem;
+            padding: 1rem 0;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-input:focus {
+            border-color: var(--text-secondary);
+        }
+
+        .form-group:focus-within .form-label {
+            color: var(--text-secondary);
+        }
+
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem 2.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: 1px solid var(--text-primary);
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .btn svg {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.3s;
+        }
+
+        .btn:hover svg {
+            transform: translateX(4px);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 3rem 0;
+        }
+
+        .footer-link {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--text-primary);
+        }
+
+        /* Utility */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+            
+            .section {
+                padding: 5rem 0;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* Status indicator */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
 </head>
-
 <body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div style="display: flex; align-items: center; justify-content: space-between; height: 64px;">
+                <a href="#" style="font-weight: 600; letter-spacing: -0.02em; font-size: 1.1rem;">
+                    LOCUS
+                </a>
+                <div style="display: flex; gap: 2.5rem;" class="hidden md:flex">
+                    <a href="#system" class="nav-link">System</a>
+                    <a href="#diagnostics" class="nav-link">Diagnostics</a>
+                    <a href="#recognition" class="nav-link">Recognition</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<div class="center-block">
-  <h1>Locus Suit</h1>
-  <div class="subtitle">Smart Sensory Wearables For Navigation</div>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="glow" style="top: -200px; left: -100px;"></div>
+        <div class="glow" style="bottom: -200px; right: -100px;"></div>
+        
+        <div class="container" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <h1 class="hero-title animate-fade-up delay-1" style="opacity: 0;">
+                Locus Suit
+            </h1>
+            
+            <p class="hero-subtitle animate-fade-up delay-2" style="margin-top: 2rem; opacity: 0;">
+                Smart Sensory Wearables for Navigation
+            </p>
+            
+            <div style="margin-top: 3rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;" class="animate-fade-up delay-3">
+                <a href="https://www.linkedin.com/company/locussuit" class="btn">
+                    LinkedIn
+                </a>
+                <a href="https://www.youtube.com/embed/qncACJptDwY?autoplay=1" class="btn">
+                    Watch Demo
+                </a>
+                <a href="#system" class="btn">
+                    Experience Locus
+                </a>
+            </div>
+        </div>
+    </section>
 
-  <div class="button-row">
-    <button class="btn" onclick="openModal()">Watch Demo</button>
+    <!-- System -->
+    <section id="system" class="section">
+        <div class="container">
+            <div class="section-label">The Locus Suit</div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+                <!-- Vest Card -->
+                <div class="card">
+                    <div class="card-image">
+                        <img src="svest.png" alt="Haptic Vest">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Haptic Vest</h3>
+                        <div class="card-meta">360° Awareness</div>
+                        <p class="card-description">
+                            8 ultrasonic transducers and LRA motors create a complete touch horizon. Objects approaching blind spots translate to graduated pressure on the torso.
+                        </p>
+                    </div>
+                </div>
 
-    <a href="https://www.linkedin.com/company/locussuit" target="_blank">
-  <button class="btn">LinkedIn</button>
-</a>
-  </div>
+                <!-- Vision Card -->
+                <div class="card">
+                    <div class="card-image">
+                        <img src="smodule.png" alt="Camera Module">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Camera Module</h3>
+                        <div class="card-meta">Visual Context</div>
+                        <p class="card-description">
+                            8 ultrasonic transducers and LRA motors create a complete touch horizon. Objects approaching blind spots translate to graduated pressure on the torso.
+                        </p>
+                    </div>
+                </div>
 
-  <div class="coming-soon">Coming Soon</div>
+                <!-- Combined Card -->
+                <div class="card">
+                    <div class="card-image">
+                        <img src="locussuit1.png" alt="Locus Suit">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Vest + Camera = Locus Suit</h3>
+                        <div class="card-meta">Restoring Independence</div>
+                        <p class="card-description">
+                           Together these two components combine to form the Locus Suit, a smart wearable system for the visually impaired and blind, and those working in low-visibility settings.
+                        </p>
+                    </div>
+                </div>
 
-</div>
+            </div>
+        </div>
+    </section>
 
-<!-- Video Modal -->
-<div id="videoModal" class="modal">
-  <div class="close" onclick="closeModal()">×</div>
+    <!-- Diagnostics -->
+    <section id="diagnostics" class="section" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-label">Interactive Diagnostics</div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+                <!-- Haptic Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">Haptic Array</span>
+                        <span class="panel-badge">Interactive</span>
+                    </div>
+                    <div class="panel-body" id="haptic-area" style="cursor: crosshair;">
+                        <div class="haptic-ring" id="haptic-ring">
+                            <div class="haptic-center"></div>
+                        </div>
+                        <div class="readout" id="haptic-readout">
+                            Direction: <span class="readout-value">—</span><br>
+                            Proximity: <span class="readout-value">—</span>
+                        </div>
+                    </div>
+                </div>
 
-  <div class="modal-content">
+                <!-- LIDAR Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">LIDAR Field</span>
+                        <span class="panel-badge">Mouse = Obstacle</span>
+                    </div>
+                    <div class="panel-body" style="padding: 0; position: relative;">
+                        <canvas id="lidar-canvas"></canvas>
+                        <div class="readout" id="lidar-readout" style="position: absolute; bottom: 1.5rem; left: 1.5rem; margin: 0;">
+                            Distance: <span class="readout-value">—</span><br>
+                            Status: <span class="readout-value">Scanning</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="subtitle">
-      Introducing the Locus Suit. Restoring Independence in Every Step.
-    </div>
-    <br>
+    <!-- Recognition -->
+    <section id="recognition" class="section">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; align-items: start;">
+                <div>
+                    <div class="section-label">Traction</div>
+                    <h2 style="font-size: 2.5rem; font-weight: 600; line-height: 1.2; margin-bottom: 1.5rem;">
+                        Validated and Recognized
+                    </h2>
+                </div>
+                
+                <div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 3rem;">
+                        <div class="recognition-card">
+                            <div class="recognition-icon">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                </svg>
+                            </div>
+                            <span class="recognition-title">NIH DEBUT Honors 2025</span>
+                        </div>
+                        <div class="recognition-card">
+                            <div class="recognition-icon">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                </svg>
+                            </div>
+                            <span class="recognition-title">SVC Winner 2025</span>
+                        </div>
+                        <div class="recognition-card">
+                            <div class="recognition-icon">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                </svg>
+                            </div>
+                            <span class="recognition-title">Trusted by MoAT</span>
+                        </div>
+                    </div>
+                    
+                    <div style="padding-top: 2rem; border-top: 1px solid var(--border);">
+                        <p class="quote">
+                            "The potential to increase independence for millions of people is remarkable."
+                        </p>
+                        <p class="quote-author">Mr. Emery, CRO @ Ignite</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <!-- YouTube embed -->
-    <div class="video-wrapper">
-      <iframe
-        id="demoVideo"
-        width="100%"
-        height="400"
-        src="https://www.youtube.com/embed/qncACJptDwY?autoplay=1"
-        title="Locus Suit Demo"
-        frameborder="0"
-        allow="autoplay; encrypted-media"
-        allowfullscreen>
-      </iframe>
-    </div>
+    <!-- Contact -->
+    <section id="contact" class="section" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div class="section-label" style="justify-content: center;">Building</div>
+                <h2 style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 4rem;">
+                    Coming Soon
+                </h2>
+            </div>
+        </div>
+    </section>
 
-  </div>
-</div>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <span class="mono" style="font-size: 0.7rem; color: var(--text-muted);">
+                    © 2025 Locus Assistive
+                </span>
+                <div style="display: flex; gap: 2rem;">
+                    <a href="#" class="footer-link">contact@locussuit.com</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-<script>
-  const modal = document.getElementById("videoModal");
-  const video = document.getElementById("demoVideo");
+    <script>
+        // Haptic Ring Simulation
+        const hapticRing = document.getElementById('haptic-ring');
+        const hapticArea = document.getElementById('haptic-area');
+        const hapticReadout = document.getElementById('haptic-readout');
+        const motorCount = 8;
+        const ringRadius = 92;
+        const motors = [];
+        const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
-  function openModal() {
-    modal.style.display = "flex";
-    video.currentTime = 0;
-    video.play();
-  }
+        // Create motors
+        for (let i = 0; i < motorCount; i++) {
+            const angle = (i * (360 / motorCount) - 90) * (Math.PI / 180);
+            const x = Math.cos(angle) * ringRadius + 110 - 6;
+            const y = Math.sin(angle) * ringRadius + 110 - 6;
+            
+            const motor = document.createElement('div');
+            motor.className = 'haptic-motor';
+            motor.style.left = `${x}px`;
+            motor.style.top = `${y}px`;
+            hapticRing.appendChild(motor);
+            motors.push(motor);
+        }
 
-  function closeModal() {
-    modal.style.display = "none";
-    video.pause();
-  }
-</script>
+        hapticArea.addEventListener('mousemove', (e) => {
+            const rect = hapticRing.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const dx = e.clientX - centerX;
+            const dy = e.clientY - centerY;
+            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            angle = (angle + 90 + 360) % 360;
+            
+            const distPx = Math.hypot(dx, dy);
+            const distMeters = (distPx / 50).toFixed(2);
+            
+            const segment = Math.round(angle / 45) % 8;
+            const dirText = directions[segment];
+            
+            motors.forEach(m => m.classList.remove('active'));
+            if (motors[segment]) motors[segment].classList.add('active');
 
+            hapticReadout.innerHTML = `Direction: <span class="readout-value">${dirText}</span><br>Proximity: <span class="readout-value">${distMeters}m</span>`;
+        });
+
+        hapticArea.addEventListener('mouseleave', () => {
+            motors.forEach(m => m.classList.remove('active'));
+            hapticReadout.innerHTML = `Direction: <span class="readout-value">—</span><br>Proximity: <span class="readout-value">—</span>`;
+        });
+
+        // LIDAR Canvas Simulation
+        const canvas = document.getElementById('lidar-canvas');
+        const ctx = canvas.getContext('2d');
+        const lidarReadout = document.getElementById('lidar-readout');
+
+        function resizeCanvas() {
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let mouse = { x: -1000, y: -1000 };
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+            
+            const centerDist = Math.hypot(mouse.x - canvas.width / 2, mouse.y - canvas.height / 2);
+            const distMeters = (centerDist / 150).toFixed(2);
+            
+            let status = 'Clear';
+            let statusColor = '#22c55e';
+            
+            if (distMeters < 0.5) {
+                status = 'Critical';
+                statusColor = '#ef4444';
+            } else if (distMeters < 1.2) {
+                status = 'Warning';
+                statusColor = '#eab308';
+            }
+            
+            lidarReadout.innerHTML = `Distance: <span class="readout-value">${distMeters}m</span><br>Status: <span class="readout-value" style="color: ${statusColor}">${status}</span>`;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            mouse.x = -1000;
+            lidarReadout.innerHTML = `Distance: <span class="readout-value">—</span><br>Status: <span class="readout-value">Scanning</span>`;
+        });
+
+        // Grid points
+        const points = [];
+        const spacing = 24;
+
+        function initPoints() {
+            points.length = 0;
+            for (let x = spacing / 2; x < canvas.width; x += spacing) {
+                for (let y = spacing / 2; y < canvas.height; y += spacing) {
+                    points.push({ x, y });
+                }
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = '#111111';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (const p of points) {
+                const dx = mouse.x - p.x;
+                const dy = mouse.y - p.y;
+                const dist = Math.hypot(dx, dy);
+                const maxDist = 120;
+
+                let size = 1;
+                let alpha = 0.15;
+
+                if (dist < maxDist) {
+                    const force = 1 - dist / maxDist;
+                    
+                    if (force > 0.7) {
+                        ctx.fillStyle = `rgba(239, 68, 68, ${force})`;
+                        size = 3;
+                    } else if (force > 0.4) {
+                        ctx.fillStyle = `rgba(234, 179, 8, ${force})`;
+                        size = 2;
+                    } else {
+                        ctx.fillStyle = `rgba(100, 150, 255, ${force})`;
+                        size = 1.5;
+                    }
+                } else {
+                    ctx.fillStyle = `rgba(64, 64, 64, ${alpha})`;
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            if (mouse.x > 0) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(mouse.x, mouse.y, 16, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        setTimeout(() => {
+            initPoints();
+            animate();
+        }, 100);
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initPoints();
+        });
+    </script>
 </body>
 </html>
