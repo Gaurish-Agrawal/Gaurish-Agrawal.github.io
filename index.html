@@ -722,14 +722,82 @@
         </div>
     </section>
 
+    <!-- User Manual Audio -->
+    <section class="section" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div class="section-label" style="justify-content: center;">Documentation</div>
+                <h2 style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 3rem;">
+                    Hear the User Manual
+                </h2>
+                
+                <div class="panel">
+                    <div class="panel-body" style="min-height: auto; padding: 3rem;">
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <img src="user.png" alt="User Manual" style="max-width: 400px; width: 100%; border-radius: 8px; border: 1px solid var(--border);">
+                        </div>
+                        
+                        <audio controls style="width: 100%; margin-top: 1.5rem;">
+                            <source src="manual.mp4" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact -->
-    <section id="contact" class="section" style="background: var(--bg-secondary);">
+    <section id="contact" class="section">
         <div class="container">
             <div style="max-width: 600px; margin: 0 auto;">
-                <div class="section-label" style="justify-content: center;">Building</div>
-                <h2 style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 4rem;">
-                    Coming Soon
+                <div class="section-label" style="justify-content: center;">Early Access</div>
+                <h2 style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 1.5rem;">
+                    Join the Waitlist
                 </h2>
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 4rem;">
+                    Be among the first to experience the Locus Suit. Register your interest below.
+                </p>
+                
+                <div class="panel">
+                    <div class="panel-body" style="min-height: auto;">
+                        <div style="width: 100%;">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Full Name</label>
+                                <input type="text" id="name" class="form-input" placeholder="Jane Doe">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email Address</label>
+                                <input type="email" id="email" class="form-input" placeholder="jane@example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="role">I am a...</label>
+                                <select id="role" class="form-input" style="cursor: pointer;">
+                                    <option value="">Select one</option>
+                                    <option value="individual">Individual interested in Locus Suit</option>
+                                    <option value="professional">Vision rehabilitation professional</option>
+                                    <option value="organization">Organization/Institution</option>
+                                    <option value="researcher">Researcher</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 2.5rem;">
+                                <label class="form-label" for="message">Message (Optional)</label>
+                                <textarea id="message" class="form-input" placeholder="Tell us about your interest..." style="resize: vertical; min-height: 80px; padding-top: 1rem;"></textarea>
+                            </div>
+                            
+                            <button class="btn" style="width: 100%;" onclick="submitForm()">
+                                Submit Interest
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -910,6 +978,49 @@
             resizeCanvas();
             initPoints();
         });
+
+        // Form submission
+        function submitForm() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const role = document.getElementById('role').value;
+            const message = document.getElementById('message').value;
+            
+            if (!name || !email || !role) {
+                alert('Please fill in all required fields (Name, Email, and Role).');
+                return;
+            }
+            
+            // Email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            // Here you would typically send the data to a server
+            console.log('Form submitted:', { name, email, role, message });
+            
+            // Show success message
+            alert('Thank you for your interest! We\'ll be in touch soon.');
+            
+            // Reset form
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('role').value = '';
+            document.getElementById('message').value = '';
+        }
+
+        // Audio player custom styling
+        const audioElement = document.querySelector('audio');
+        if (audioElement) {
+            audioElement.style.cssText = `
+                background: var(--bg-tertiary);
+                border-radius: 8px;
+                border: 1px solid var(--border);
+                padding: 0.5rem;
+            `;
+        }
     </script>
 </body>
 </html>
